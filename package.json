@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cron": "NODE_OPTIONS=\"--loader ts-node/esm\" ts-node scripts/start-cron.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -38,6 +39,8 @@
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
@@ -48,6 +51,7 @@
     "lucide-react": "^0.454.0",
     "next": "^14.2.23",
     "next-themes": "^0.4.4",
+    "puppeteer": "^24.1.0",
     "react": "^18",
     "react-day-picker": "8.10.1",
     "react-dom": "^18",
@@ -62,10 +66,13 @@
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/node-cron": "^3.0.11",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "node-cron": "^3.0.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

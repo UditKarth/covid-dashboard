@@ -2,6 +2,7 @@
 
 import { CovidStats, RegionData } from '../types/covid'
 import { worldCountries, usStates, europeanCountries } from '../data/regions'
+import { readFile } from 'fs/promises'
 
 function generateRandomStats(place: { name: string, code: string }, regionId: string): CovidStats {
   return {
@@ -14,33 +15,30 @@ function generateRandomStats(place: { name: string, code: string }, regionId: st
   }
 }
 
-export async function getCovidData(): Promise<{
-  global: RegionData[]
-  totals: CovidStats
-}> {
-  const regions = {
-    world: worldCountries,
-    us: usStates,
-    europe: europeanCountries,
+
+export async function getCovidData() {
+  try {
+    const data = await readFile('./data/covid-data.json', 'utf-8')
+    const parsedData = JSON.parse(data)
+    return {
+      global: parsedData,
+      totals: calculateTotals(parsedData)
+    }
+  } catch (error) {
+    console.error('Error reading COVID data:', error)
+    return { global: [], totals: {} }
   }
+}
 
-  const data = Object.entries(regions).map(([region, places]) => ({
-    name: region,
-    stats: places.map(place => generateRandomStats(place, region))
-  }))
-
-  const totals = {
+function calculateTotals(data: RegionData[]): CovidStats {
+  const worldStats = data.find(r => r.name === 'world')?.stats || []
+  return {
     id: 'global-total',
     name: 'Global',
     code: 'GLOBAL',
-    confirmed: data.reduce((acc, region) => 
-      acc + region.stats.reduce((sum, stat) => sum + stat.confirmed, 0), 0),
-    deaths: data.reduce((acc, region) => 
-      acc + region.stats.reduce((sum, stat) => sum + stat.deaths, 0), 0),
-    weeklyIncrease: data.reduce((acc, region) => 
-      acc + region.stats.reduce((sum, stat) => sum + stat.weeklyIncrease, 0), 0)
+    confirmed: worldStats.reduce((sum, stat) => sum + stat.confirmed, 0),
+    deaths: worldStats.reduce((sum, stat) => sum + stat.deaths, 0),
+    weeklyIncrease: worldStats.reduce((sum, stat) => sum + stat.weeklyIncrease, 0)
   }
-
-  return { global: data, totals }
 }
 
