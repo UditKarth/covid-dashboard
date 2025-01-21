@@ -8,45 +8,35 @@ import { RegionData, CovidStats } from './types/covid'
 
 export default function Page() {
   const [data, setData] = useState<{ global: RegionData[], totals: CovidStats } | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [progress, setProgress] = useState<{ current: number; total: number; country?: string } | null>(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/covid')
-        if (!response.ok) throw new Error('Failed to fetch data')
-        
-        const result = await response.json()
-        if (result.error) throw new Error(result.error)
+    const eventSource = new EventSource('/api/covid')
 
-        setData({
-          global: result,
-          totals: calculateTotals(result)
-        })
-        setError(null)
-      } catch (err) {
-        console.error('Error fetching data:', err)
-        setError(err instanceof Error ? err.message : 'Failed to fetch data')
-      }
+    eventSource.onmessage = (event) => {
+      const { data: newData, progress: newProgress } = JSON.parse(event.data)
+      setData({
+        global: newData,
+        totals: calculateTotals(newData)
+      })
+      setProgress(newProgress)
     }
 
-    fetchData()
-    const interval = setInterval(fetchData, 6 * 60 * 60 * 1000) // 6 hours
-    return () => clearInterval(interval)
+    return () => {
+      eventSource.close()
+    }
   }, [])
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-red-500">Error: {error}</div>
-      </div>
-    )
-  }
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center flex-col gap-4">
         <div className="animate-pulse">Loading...</div>
+        {progress && (
+          <div className="text-sm text-muted-foreground">
+            Scraping data: {progress.current}/{progress.total}
+            {progress.country && ` - ${progress.country}`}
+          </div>
+        )}
       </div>
     )
   }
