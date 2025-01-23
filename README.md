@@ -61,7 +61,7 @@ npm run dev
 
 ## Data Updates
 
-The dashboard fetches data from WHO's COVID-19 dashboard using a concurrent scraping system. Data is cached for 6 hours to minimize load on WHO's servers and ensure responsive performance.
+The dashboard fetches data from WHO's COVID-19 dashboard using a concurrent scraping system. Data is cached for 6 hours to minimize load on WHO's servers and ensure responsive performance. The data is fetched on load and streamed to the client.
 
 ### Data Structure
 
