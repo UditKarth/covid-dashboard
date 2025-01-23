@@ -45,6 +45,10 @@ cd covid-19-dashboard
 ```bash
 npm install
 ```
+or 
+```bash
+yarn install
+```
 
 3. Run the development server:
 
@@ -53,7 +57,6 @@ npm run dev
 ```
 
 4. Open your browser and navigate to `http://localhost:3000` to view the dashboard.
-
 
 
 ## Data Updates
